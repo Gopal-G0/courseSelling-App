@@ -1,24 +1,16 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
+const { userRouter } = require('./routes/user');
 
 const app = express();
 
-app.post('/signup', (req,res) => {
+app.use('/user',userRouter);
+app.use('/course',courseRouter);
+
+app.get('/courses', (req,res) => {
 
 });
 
-app.post('/login', (req,res) => {
-
-});
-
-app.post('/purchase', (req,res) => {
-
-});
-
-app.get('/getCourses', (req,res) => {
-
-});
-
-app.get('/getPurchasedCourses', (req,res) => {
-
+app.listen(3000, () => {
+    console.log('Server is running on port: 3000');
 });
