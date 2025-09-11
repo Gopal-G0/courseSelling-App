@@ -7,12 +7,10 @@ userRouter.post('/signup', async (req,res) => {
     
     const { email, password, firstName, lastName } = req.body;
 
-    const hashedPassword = bcrypt.hash(password,5);
-
     await userModel.insertOne({
 
         email: email,
-        password: hashedPassword,
+        password: password,
         firstName: firstName,
         lastName: lastName
 
