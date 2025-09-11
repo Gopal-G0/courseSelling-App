@@ -2,7 +2,7 @@ const { Router } = require('express');
 const jwt = require('jsonwebtoken');
 const { z } = require('zod');
 const bcrypt = require('bcryptjs');
-const { adminModel } = require('../db');
+const { adminModel, courseModel } = require('../db');
 const { adminMiddleware } = require('../middlewares/adminAuth');
 
 const adminRouter = Router();
@@ -106,10 +106,27 @@ adminRouter.post('/course', adminMiddleware, async (req, res) => {
 
 });
 
-adminRouter.put('/course', (req, res) => {
-    res.json({
-        message: 'Admin can preview courses and can create too'
+adminRouter.put('/course', async (req, res) => {
+    
+    const adminId = req.adminId;
+
+    const { title, description, imageUrl, price } = req.body;
+
+    const courseFound = await courseModel.findOne({
+        title,
+        description
     });
+
+    if(courseFound) {
+
+        await courseModel.updateOne({
+            title: title,
+            description: description,
+            imageUrl: imageUrl,
+            price: price,
+            creatorId: adminId
+        });
+    }
 
 });
 
