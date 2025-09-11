@@ -1,6 +1,6 @@
 const { Router } = require('express');
-const { bcrypt } = require('bcrypt');
 const { z } = require('zod');
+const bcrypt = require('bcryptjs');
 const { userModel } = require('../db');
 const userRouter = Router();
 
@@ -31,13 +31,16 @@ userRouter.post('/signup', async (req, res) => {
 
     const { email, password, firstName, lastName } = req.body;
 
+    const hashedPassword = await bcrypt.hash(password, 10);
+    console.log(hashedPassword);
+
     await userModel.insertOne({
 
         email: email,
-        password: password,
+        password: hashedPassword,
         firstName: firstName,
-        lastName: lastName
-
+        lastName: lastName,
+        salt
     });
 
     res.json({
