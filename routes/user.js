@@ -1,4 +1,5 @@
 const { Router } = require('express');
+const jwt = require('jsonwebtoken');
 const { z } = require('zod');
 const bcrypt = require('bcryptjs');
 const { userModel } = require('../db');
@@ -32,7 +33,6 @@ userRouter.post('/signup', async (req, res) => {
     const { email, password, firstName, lastName } = req.body;
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    console.log(hashedPassword);
 
     await userModel.insertOne({
 
@@ -40,7 +40,6 @@ userRouter.post('/signup', async (req, res) => {
         password: hashedPassword,
         firstName: firstName,
         lastName: lastName,
-        salt
     });
 
     res.json({
@@ -49,8 +48,34 @@ userRouter.post('/signup', async (req, res) => {
 
 });
 
-userRouter.post('/login', (req, res) => {
+userRouter.post('/login', async (req, res) => {
 
+    const { email, password } = req.body;
+
+    const user = await userModel.findOne({
+        email: email
+    });
+
+    const passwordValidated = bcrypt.compare(password, user.password);
+
+    if (passwordValidated) {
+
+        const token = jwt.sign({
+            id: user._id
+        }, process.env.jwt_userSecret);
+
+        // use cookie/session based authentication 
+        res.json({
+            message: 'Logged in Successfully',
+            token: token
+        });
+
+    } else {
+
+        res.status(403).json({
+            message: "User not found or wrond credentials"
+        });
+    }
 
 });
 
