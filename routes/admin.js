@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const { z } = require('zod');
 const bcrypt = require('bcryptjs');
 const { adminModel } = require('../db');
+const { adminMiddleware } = require('../middlewares/adminAuth');
 
 const adminRouter = Router();
 
@@ -63,7 +64,7 @@ adminRouter.post('/login', async (req, res) => {
     if (passwordValidated) {
 
         const token = jwt.sign({
-            id: user._id
+            id: admin._id
         }, process.env.jwt_adminSecret);
 
         // use cookie/session based authentication 
@@ -81,9 +82,26 @@ adminRouter.post('/login', async (req, res) => {
 
 });
 
-adminRouter.post('/course', (req, res) => {
+adminRouter.post('/course', adminMiddleware, async (req, res) => {
+    
+    const adminId = req.adminId;
+
+    const { title, description, imageUrl, price} = req.body;
+
+    const course = await courseModel.insertOne({
+
+        title: title,
+        description: description,
+        imageUrl: imageUrl,
+        price: price,
+        creatorId: adminId
+
+    });
+
     res.json({
-        message: 'Admin can preview courses and can create too'
+        message: 'Course Created',
+        title,
+        courseId: course._id
     });
 
 });

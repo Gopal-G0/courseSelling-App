@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const { z } = require('zod');
 const bcrypt = require('bcryptjs');
 const { userModel } = require('../db');
+const { userMiddleware } = require('../middlewares/userAuth');
 const userRouter = Router();
 
 userRouter.post('/signup', async (req, res) => {
@@ -79,7 +80,7 @@ userRouter.post('/login', async (req, res) => {
 
 });
 
-userRouter.get('/PurchasedCourses', (req, res) => {
+userRouter.get('/PurchasedCourses', userMiddleware, (req, res) => {
     res.json({
         message: 'Get list of purchased courses'
     });
