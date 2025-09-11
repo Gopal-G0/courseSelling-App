@@ -1,10 +1,34 @@
 const { Router } = require('express');
 const { bcrypt } = require('bcrypt');
+const { z } = require('zod');
 const { userModel } = require('../db');
 const userRouter = Router();
 
-userRouter.post('/signup', async (req,res) => {
-    
+userRouter.post('/signup', async (req, res) => {
+
+    const requiredBody = z.object({
+
+        email: z.string().min(10).max(50).includes('@'),
+        password: z.string().regex(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$/, {
+            message: "Password must contain at least one uppercase letter, one lowercase letter, one digit, and be at least 8 characters long",
+        }).min(8).max(25),
+
+        firstName: z.string().min(4).max(25),
+        lastName: z.string().min(2).max(10)
+    });
+
+    const parsedData = requiredBody.safeParse(req.body);
+
+    if (!parsedData.success) {
+
+        res.json({
+            message: 'Incorrect Format',
+            error: parsedData.error.message
+        });
+
+        return;
+    }
+
     const { email, password, firstName, lastName } = req.body;
 
     await userModel.insertOne({
@@ -22,12 +46,12 @@ userRouter.post('/signup', async (req,res) => {
 
 });
 
-userRouter.post('/login', (req,res) => {
-    
+userRouter.post('/login', (req, res) => {
+
 
 });
 
-userRouter.get('/PurchasedCourses', (req,res) => {
+userRouter.get('/PurchasedCourses', (req, res) => {
     res.json({
         message: 'Get list of purchased courses'
     });
