@@ -52,7 +52,7 @@ adminRouter.post('/signup', async (req, res) => {
 });
 
 adminRouter.post('/login', async (req, res) => {
-    
+
     const { email, password } = req.body;
 
     const admin = await adminModel.findOne({
@@ -83,10 +83,10 @@ adminRouter.post('/login', async (req, res) => {
 });
 
 adminRouter.post('/course', adminMiddleware, async (req, res) => {
-    
+
     const adminId = req.adminId;
 
-    const { title, description, imageUrl, price} = req.body;
+    const { title, description, imageUrl, price } = req.body;
 
     const course = await courseModel.insertOne({
 
@@ -106,8 +106,8 @@ adminRouter.post('/course', adminMiddleware, async (req, res) => {
 
 });
 
-adminRouter.put('/course', async (req, res) => {
-    
+adminRouter.put('/course', adminMiddleware, async (req, res) => {
+
     const adminId = req.adminId;
 
     const { title, description, imageUrl, price } = req.body;
@@ -117,22 +117,38 @@ adminRouter.put('/course', async (req, res) => {
         description
     });
 
-    if(courseFound) {
+    if (courseFound) {
 
         await courseModel.updateOne({
+            _id: courseId,
+            creatorId: adminId
+        }, {
             title: title,
             description: description,
             imageUrl: imageUrl,
             price: price,
-            creatorId: adminId
+        });
+    } else {
+
+        res.json({
+            message: "Course with the given details doesn't exist"
         });
     }
 
 });
 
-adminRouter.get('/getCourses', (req, res) => {
+adminRouter.get('/getCourses', adminMiddleware, (req, res) => {
+
+    const adminId = req.adminId;
+
+    const courses = courseModel.find({
+
+        creatorId: adminId
+
+    });
+
     res.json({
-        message: 'Admin can preview courses and can create too'
+        courses
     });
 
 });
