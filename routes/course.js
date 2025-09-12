@@ -9,15 +9,22 @@ courseRouter.post('/purchase', userMiddleware, async (req, res) => {
 
     try {
 
-        const response = await courseModel.findOne({
+        const course = await courseModel.findOne({
             title
         });
+
+        console.log(course.title);
+        console.log(course.description);
+        console.log(course.price);
+        console.log(req.userId);
 
         await purchaseModel.create({
 
             userId: req.userId,
-            courseId: response._id,
-            response
+            courseId: course._id,
+            title: course.title,
+            description: course.description,
+            price: course.price
         });
 
         res.json({
@@ -36,10 +43,14 @@ courseRouter.post('/purchase', userMiddleware, async (req, res) => {
 
 });
 
-courseRouter.get('/preview', (req, res) => {
+courseRouter.get('/preview', async (req, res) => {
+    
+    const courses = await courseModel.find({});
+
     res.json({
-        message: 'get preview of the course'
+        courses
     });
+
 });
 
 module.exports = {
