@@ -7,13 +7,13 @@ courseRouter.post('/purchase', userMiddleware, async (req, res) => {
 
     const title = req.body.title;
 
-    const response = await courseModel.find({
-        title
-    });
-
     try {
 
-        await purchaseModel.insertOne({
+        const response = await courseModel.findOne({
+            title
+        });
+
+        await purchaseModel.create({
 
             userId: req.userId,
             courseId: response._id,

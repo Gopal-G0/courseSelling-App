@@ -35,14 +35,11 @@ const purchaseSchema = new Schema({
     courseId: ObjectId,
     title: String,
     description: String,
-    price: Number,
-    imageUrl: String,
-    creatorId: ObjectId
-
+    price: Number
 });
 
 const userModel = mongoose.model('users', userSchema);
-const adminModel = mongoose.model('admin', adminSchema);
+const adminModel = mongoose.model('admins', adminSchema);
 const courseModel = mongoose.model('courses', courseSchema);
 const purchaseModel = mongoose.model('purchases', purchaseSchema);
 
